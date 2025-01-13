@@ -29,6 +29,7 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java-library'
+
   sourceCompatibility = 11
 
   // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
@@ -57,8 +58,11 @@ configure(subprojects) {
 }
 
 subprojects {
-  version = '$projectVersion'
+  apply plugin: 'maven-publish'
+
+  version = "$projectVersion"
   ext.appName = 'gdx-TiledTsxBorderCreator'
+  group = "dev.lyze"
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
@@ -67,6 +71,17 @@ subprojects {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+  }
+
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        groupId project.group
+        artifactId project.name
+        version project.version
+        from components.java
+      }
+    }
   }
 }
 

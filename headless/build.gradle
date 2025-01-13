@@ -1,6 +1,5 @@
 apply plugin: 'application'
 
-
 java.sourceCompatibility = 11
 java.targetCompatibility = 11
 if (JavaVersion.current().isJava9Compatible()) {
@@ -34,3 +33,4 @@ jar {
 tasks.register('dist') {
   dependsOn 'jar'
 }
+
