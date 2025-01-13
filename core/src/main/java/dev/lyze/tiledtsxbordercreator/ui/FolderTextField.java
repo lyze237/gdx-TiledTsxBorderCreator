@@ -8,10 +8,12 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
+import dev.lyze.tiledtsxbordercreator.utils.StringUtils;
 
 public class FolderTextField extends VisTable {
     private final IDesktopNatives natives;
     private final VisValidatableTextField textField = new VisValidatableTextField();
+    private final VisValidatableTextField displayTextField = new VisValidatableTextField();
 
     public FolderTextField(IDesktopNatives natives) {
         this.natives = natives;
@@ -26,14 +28,14 @@ public class FolderTextField extends VisTable {
             }
         });
 
-        textField.addListener(new ClickListener() {
+        displayTextField.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 onClicked();
             }
         });
 
-        add(textField).growX().padRight(5);
+        add(displayTextField).growX().padRight(5);
         add(button);
     }
 
@@ -44,7 +46,15 @@ public class FolderTextField extends VisTable {
     public void setPath(String path) {
         if (path != null) {
             textField.setText(path);
+            displayTextField.setText(StringUtils.substringFromRight(path, 42));
         }
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        displayTextField.setInputValid(textField.isInputValid());
     }
 
     public VisValidatableTextField getTextField() {
