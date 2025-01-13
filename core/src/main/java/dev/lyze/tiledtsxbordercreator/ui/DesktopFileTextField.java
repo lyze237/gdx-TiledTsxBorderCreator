@@ -43,7 +43,10 @@ public class DesktopFileTextField extends VisTable {
     }
 
     private void onClicked() {
-        var path = natives.openFilePicker();
+        setPath(natives.openFilePicker());
+    }
+
+    public void setPath(String path) {
         if (path != null) {
             textField.setText(path);
             displayTextField.setText(StringUtils.substringFromRight(path, 42));

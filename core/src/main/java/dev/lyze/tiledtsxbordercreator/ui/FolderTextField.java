@@ -38,7 +38,10 @@ public class FolderTextField extends VisTable {
     }
 
     private void onClicked() {
-        var path = natives.openFolderPicker();
+        setPath(natives.openFolderPicker());
+    }
+
+    public void setPath(String path) {
         if (path != null) {
             textField.setText(path);
         }

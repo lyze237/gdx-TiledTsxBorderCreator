@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.*;
 import dev.lyze.tiledtsxbordercreator.TiledTsxBorderCreator;
+import dev.lyze.tiledtsxbordercreator.natives.DragAndDropListener;
 import dev.lyze.tiledtsxbordercreator.natives.ICommandLineNatives;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
 import dev.lyze.tiledtsxbordercreator.ui.*;
@@ -23,15 +24,17 @@ import dev.lyze.tiledtsxbordercreator.ui.*;
 public class InteractiveDesktopMode extends ScreenAdapter {
     private final IDesktopNatives desktopNatives;
     private final ICommandLineNatives commandLineNatives;
+    private final DragAndDropListener dragAndDropListener;
 
     private final Stage stage = new Stage(new ScreenViewport());
 
     private final SpriteBatch batch = new SpriteBatch();
     private final Texture background = new Texture("background.png");
 
-    public InteractiveDesktopMode(IDesktopNatives desktopNatives, ICommandLineNatives commandLineNatives) {
+    public InteractiveDesktopMode(IDesktopNatives desktopNatives, ICommandLineNatives commandLineNatives, DragAndDropListener dragAndDropListener) {
         this.desktopNatives = desktopNatives;
         this.commandLineNatives = commandLineNatives;
+        this.dragAndDropListener = dragAndDropListener;
 
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
@@ -63,8 +66,20 @@ public class InteractiveDesktopMode extends ScreenAdapter {
         var outputImageFileTextField = new VisValidatableTextField();
 
         var borderTextField = new VisValidatableTextField("4");
-
         var overrideExistingFiles = new VisCheckBox("Override existing files");
+
+        dragAndDropListener.setListener(new StringChangeListener() {
+            @Override
+            public void changed(String path) {
+                if (path.endsWith(".tsx")) {
+                    tsxFileTextField.setPath(path);
+                } else if (path.endsWith(".png")) {
+                    imageFileTextField.setPath(path);
+                } else if (Gdx.files.absolute(path).isDirectory()) {
+                    outputFolderTextField.setPath(path);
+                }
+            }
+        });
 
         validator.custom(tsxFileTextField.getTextField(), new DesktopFileValidator(".tsx", "Tsx file not set or not a .tsx file"));
         validator.custom(imageFileTextField.getTextField(), new DesktopFileValidator(".png", "Image file not set or not a .png file"));

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import dev.lyze.tiledtsxbordercreator.modes.CommandLineMode;
 import dev.lyze.tiledtsxbordercreator.modes.InteractiveDesktopMode;
 import dev.lyze.tiledtsxbordercreator.modes.InteractiveGwtMode;
+import dev.lyze.tiledtsxbordercreator.natives.DragAndDropListener;
 import dev.lyze.tiledtsxbordercreator.natives.ICommandLineNatives;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
 import dev.lyze.tiledtsxbordercreator.natives.IGwtNatives;
@@ -15,6 +16,7 @@ public class Main extends Game {
     private IDesktopNatives desktopNatives;
     private ICommandLineNatives commandLineNatives;
     private IGwtNatives gwtNatives;
+    private DragAndDropListener dragAndDropListener;
 
     @Override
     public void create() {
@@ -26,7 +28,7 @@ public class Main extends Game {
                 if (args.length > 0) {
                     setScreen(new CommandLineMode(args, commandLineNatives));
                 } else {
-                    setScreen(new InteractiveDesktopMode(desktopNatives, commandLineNatives));
+                    setScreen(new InteractiveDesktopMode(desktopNatives, commandLineNatives, dragAndDropListener));
                 }
                 break;
             case HeadlessDesktop:
@@ -51,5 +53,9 @@ public class Main extends Game {
 
     public void setGwtNatives(IGwtNatives gwtNatives) {
         this.gwtNatives = gwtNatives;
+    }
+
+    public void setDragAndDropListener(DragAndDropListener dragAndDropListener) {
+        this.dragAndDropListener = dragAndDropListener;
     }
 }

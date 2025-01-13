@@ -2,7 +2,9 @@ package dev.lyze.tiledtsxbordercreator.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 import dev.lyze.tiledtsxbordercreator.Main;
+import dev.lyze.tiledtsxbordercreator.natives.DragAndDropListener;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -12,11 +14,22 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication(String[] args) {
+        var configuration = getDefaultConfiguration();
+        var dragAndDropListener = new DragAndDropListener();
+        configuration.setWindowListener(new Lwjgl3WindowAdapter() {
+            @Override
+            public void filesDropped(String[] files) {
+                for (var file : files) {
+                    dragAndDropListener.invokeListener(file);
+                }
+            }
+        });
         var main = new Main();
         main.setArgs(args);
         main.setDesktopNatives(new DesktopNatives());
         main.setCommandLineNatives(new CommandLineNatives());
-        return new Lwjgl3Application(main, getDefaultConfiguration());
+        main.setDragAndDropListener(dragAndDropListener);
+        return new Lwjgl3Application(main, configuration);
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
