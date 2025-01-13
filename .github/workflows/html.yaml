@@ -1,13 +1,17 @@
-name: Publish to Github pages and releases
+name: Publish to Github pages
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,21 +31,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: html/build/dist
-
-      - name: Build project
-        run: |
-          ./gradlew jar packageWinX64 packageLinuxX64
-          mv headless/build/libs/gdx*.jar headless/build/libs/gdx-TiledTsxBorderCreator-headless.jar
-          mv lwjgl3/build/libs/gdx*.jar lwjgl3/build/libs/gdx-TiledTsxBorderCreator-desktop.jar
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            lwjgl3/build/libs/gdx-TiledTsxBorderCreator-desktop.jar
-            headless/build/libs/gdx-TiledTsxBorderCreator-headless.jar
-            lwjgl3/build/construo/dist/gdx-TiledTsxBorderCreator-linuxX64.zip
-            lwjgl3/build/construo/dist/gdx-TiledTsxBorderCreator-winX64.zip
 
   deploy:
     needs: build
