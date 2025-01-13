@@ -55,6 +55,7 @@ public class InteractiveGwtMode extends ScreenAdapter {
         var tsxFileTextField = new GwtTsxFileTextField(gwtNatives);
         var imageFileTextField = new GwtImageFileTextField(gwtNatives);
 
+        var outputTsxFileTextField = new VisValidatableTextField();
         var outputImageFileTextField = new VisValidatableTextField();
 
         var borderTextField = new VisValidatableTextField("4");
@@ -62,6 +63,7 @@ public class InteractiveGwtMode extends ScreenAdapter {
         validator.custom(tsxFileTextField.getTextField(), new FileEndsInValidator(".tsx", "Tsx file does not end in .tsx"));
         validator.custom(imageFileTextField.getTextField(), new FileEndsInValidator(".png", "Image file does not end in .png"));
 
+        validator.custom(outputTsxFileTextField, new FileEndsInValidator(".tsx", "Output .tsx file file does not end in .tsx"));
         validator.custom(outputImageFileTextField, new FileEndsInValidator(".png", "Output .png file file does not end in .png"));
         validator.integerNumber(borderTextField, "Border must be an number");
 
@@ -72,6 +74,14 @@ public class InteractiveGwtMode extends ScreenAdapter {
 
         table.add(new VisLabel("Tsx file: ")).left().padRight(4);
         table.add(tsxFileTextField).width(textFieldWidth).row();
+        tsxFileTextField.setChangeListener(new StringChangeListener() {
+            @Override
+            public void changed(String newValue) {
+                if (tsxFileTextField.getTextField().isInputValid()) {
+                    outputTsxFileTextField.setText(newValue);
+                }
+            }
+        });
 
         table.add(new VisLabel("Image file: ")).left().padRight(4);
         table.add(imageFileTextField).width(textFieldWidth).row();
@@ -89,6 +99,9 @@ public class InteractiveGwtMode extends ScreenAdapter {
 
         table.add().padBottom(padBottom).row();
 
+        table.add(new VisLabel("Output .tsx file: ")).left().padRight(4);
+        table.add(outputTsxFileTextField).width(textFieldWidth).row();
+
         table.add(new VisLabel("Output .png file: ")).left().padRight(4);
         table.add(outputImageFileTextField).width(textFieldWidth).row();
 
@@ -97,7 +110,7 @@ public class InteractiveGwtMode extends ScreenAdapter {
         convertButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                onConvertClicked(tsxFileTextField.getText(), tsxFileTextField.getContent(), imageFileTextField.getImage(), outputImageFileTextField.getText(), Integer.parseInt(borderTextField.getText()));
+                onConvertClicked(outputTsxFileTextField.getText(), tsxFileTextField.getContent(), imageFileTextField.getImage(), outputImageFileTextField.getText(), Integer.parseInt(borderTextField.getText()));
             }
         });
 
@@ -110,9 +123,9 @@ public class InteractiveGwtMode extends ScreenAdapter {
         dialog.show(stage);
     }
 
-    private void onConvertClicked(String tsxFileName, String tsxFileContent, Pixmap imageFileContent, String relativeOutputImagePath, int border) {
+    private void onConvertClicked(String outputTsxFileName, String tsxFileContent, Pixmap imageFileContent, String relativeOutputImagePath, int border) {
         var tsxFileParser = new TsxFileFixer(tsxFileContent, imageFileContent);
-        var result = tsxFileParser.convert(tsxFileName, relativeOutputImagePath, border);
+        var result = tsxFileParser.convert(outputTsxFileName, relativeOutputImagePath, border);
 
         var resultDialog = new ResultDialog(result, gwtNatives);
         resultDialog.show(stage);

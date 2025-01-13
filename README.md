@@ -1,38 +1,36 @@
 # gdx-TiledTsxBorderCreator
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+A project to add "padding" to tiled tilesets.
 
-This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
+This prevents opengl "artifacts" like those ugly "lines" when zooming in or out.
 
-## Platforms
+### Screenshots
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
-- `html`: Web platform using GWT and WebGL. Supports only Java projects.
-- `headless`: Desktop platform without a graphical interface.
+| Desktop Interface                      | Browser Interface                      | Result Interface                     | Console Interface                      |
+|----------------------------------------|----------------------------------------|--------------------------------------|----------------------------------------|
+| ![Desktop Interface](docs/desktop.png) | ![Browser Interface](docs/browser.png) | ![Result Interface](docs/result.png) | ![Console Interface](docs/console.png) |
 
-## Gradle
+### How to run:
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+#### Make sure that you have [java jdk 17+](https://bell-sw.com/pages/downloads/￥) installed
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `headless:run`: starts the headless application. Note: if headless sources were not modified - and the application still creates `ApplicationListener` from `core` project - this task might fail due to no graphics support.
-- `html:dist`: compiles GWT sources. The compiled application can be found at `html/build/dist`: you can use any HTTP server to deploy it.
-- `html:superDev`: compiles GWT sources and runs the application in SuperDev mode. It will be available at [localhost:8080/html](http://localhost:8080/html). Use only during development.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+There are four ways to run the app:
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+1. Interactive desktop mode (TODO):
+    1. Download the desktop jar from the [releases](https://github.com/lyze237/gdx-TiledTsxBorderCreator/releases) page
+    2. Run it via `java -jar filename.jar`
+2. Commandline mode (TODO):
+    1. Download the desktop jar or headless jar (for when your computer doesn't have a graphics card. For example a vm,
+       github actions or docker) from the [releases](https://github.com/lyze237/gdx-TiledTsxBorderCreator/releases) page
+    2. Run `java -jar filename.jar --help` to see a help screen with what parameters you need to use.
+    3. Run it via `java -jar filename.jar input.tsx input.png outputfolder out.tsx out.png bordersize`
+3. Website (TODO):
+    1. Open https://lyze237.github.io/gdx-TiledTsxBorderCreator/
+4. Gradle task:
+    1. TODO
+
+### Run from source:
+
+1. Clone the repo
+2. Run `./gradlew.bat jar` to create jar files in `lwjgl3/build/libs` or `headless/build/libs`
+3. Then refer to "How to run" with either one of the two jar files
