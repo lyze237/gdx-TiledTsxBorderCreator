@@ -3,29 +3,38 @@ package dev.lyze.tiledtsxbordercreator.modes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.FormValidator;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.VisValidatableTextField;
+import com.kotcrab.vis.ui.widget.*;
 import dev.lyze.tiledtsxbordercreator.TiledTsxBorderCreator;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
 import dev.lyze.tiledtsxbordercreator.ui.*;
+
+import java.lang.invoke.VarHandle;
 
 public class InteractiveDesktopMode extends ScreenAdapter {
     private final IDesktopNatives desktopNatives;
 
     private final Stage stage = new Stage(new ScreenViewport());
 
+    private final SpriteBatch batch = new SpriteBatch();
+    private final Texture background = new Texture("background.png");
+
     public InteractiveDesktopMode(IDesktopNatives desktopNatives) {
         this.desktopNatives = desktopNatives;
+
+        background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         setupUi();
     }
@@ -33,17 +42,14 @@ public class InteractiveDesktopMode extends ScreenAdapter {
     private void setupUi() {
         VisUI.load();
 
-        var root = new VisTable();
-        root.defaults().padBottom(8);
-        root.setFillParent(true);
-        stage.addActor(root);
+        var dialog = new VisDialog("Tiled Tsx Border Creator");
 
-        var inner = new VisTable();
-        inner.setBackground("window-bg");
-        root.add(inner).fill();
+        var root = new VisTable();
+        dialog.getContentTable().add(root).grow().pad(12);
 
         var table = new VisTable();
-        inner.add(table).pad(12).expand().fill();
+        table.defaults().pad(2);
+        root.add(table).expand();
 
         var convertButton = new VisTextButton("Convert");
         var validator = new FormValidator(convertButton);
@@ -59,43 +65,62 @@ public class InteractiveDesktopMode extends ScreenAdapter {
 
         var borderTextField = new VisValidatableTextField("4");
 
-        validator.custom(tsxFileTextField, new AbsoluteFileInputValidator("Tsx file not set"));
-        validator.custom(imageFileTextField, new AbsoluteFileInputValidator("Image file not set"));
-        validator.custom(outputFolderTextField, new AbsoluteFileInputValidator("Output folder not set"));
-        validator.custom(outputTsxFileTextField, new FileEndsInValidator(".tsx", "Output tsx file does not end in .tsx"));
-        validator.custom(outputImageFileTextField, new FileEndsInValidator(".png", "Output file file does not end in .png"));
+        var overrideExistingFiles = new VisCheckBox("Override existing files");
+
+        validator.custom(tsxFileTextField.getTextField(), new AbsoluteFileInputValidator(".tsx", "Tsx file not set or not a .tsx file"));
+        validator.custom(imageFileTextField.getTextField(), new AbsoluteFileInputValidator(".png", "Image file not set or not a .png file"));
+        validator.custom(outputFolderTextField.getTextField(), new AbsoluteFileInputValidator("Output folder not set"));
+        validator.custom(outputTsxFileTextField, new FileEndsInValidator(".tsx", "Output .tsx file does not end in .tsx"));
+        validator.custom(outputImageFileTextField, new FileEndsInValidator(".png", "Output .png file file does not end in .png"));
         validator.integerNumber(borderTextField, "Border must be an number");
 
         validator.setMessageLabel(validationLabel);
 
-        table.add(new VisLabel("Tsx File: ")).left().padRight(4);
-        table.add(tsxFileTextField).width(600).row();
+        var textFieldWidth = 400;
+        var padBottom = 24;
 
-        table.add(new VisLabel("Image File: ")).left().padRight(4);
-        table.add(imageFileTextField).width(600).row();
+        table.add(new VisLabel("Tsx file: ")).left().padRight(4);
+        table.add(tsxFileTextField).width(textFieldWidth).row();
+        tsxFileTextField.setChangeListener(new StringChangeListener() {
+            @Override
+            public void changed(String newValue) {
+                if (tsxFileTextField.getTextField().isInputValid()) {
+                    outputTsxFileTextField.setText(Gdx.files.absolute(newValue).name());
+                }
+            }
+        });
 
-        table.add().padBottom(24).row();
+        table.add(new VisLabel("Image file: ")).left().padRight(4);
+        table.add(imageFileTextField).width(textFieldWidth).row();
+        imageFileTextField.setChangeListener(new StringChangeListener() {
+            @Override
+            public void changed(String newValue) {
+                if (imageFileTextField.getTextField().isInputValid()) {
+                    outputImageFileTextField.setText(Gdx.files.absolute(newValue).name());
+                }
+            }
+        });
 
         table.add(new VisLabel("Border Size: ")).left().padRight(4);
-        table.add(borderTextField).width(600).row();
+        table.add(borderTextField).width(textFieldWidth).row();
 
-        table.add().padBottom(24).row();
+        table.add().padBottom(padBottom).row();
 
-        table.add(new VisLabel("Output Folder: ")).left().padRight(4);
-        table.add(outputFolderTextField).width(600).row();
+        table.add(new VisLabel("Output folder: ")).left().padRight(4);
+        table.add(outputFolderTextField).width(textFieldWidth).row();
 
-        table.add(new VisLabel("Relative output .tsx file: ")).left().padRight(4);
-        table.add(outputTsxFileTextField).width(600).row();
+        table.add(new VisLabel("Output .tsx file: ")).left().padRight(4);
+        table.add(outputTsxFileTextField).width(textFieldWidth).row();
 
-        table.add(new VisLabel("Relative output image file: ")).left().padRight(4);
-        table.add(outputImageFileTextField).width(600).row();
+        table.add(new VisLabel("Output .png file: ")).left().padRight(4);
+        table.add(outputImageFileTextField).width(textFieldWidth).row();
 
-        table.add().padBottom(24).row();
+        table.add().padBottom(padBottom).row();
 
         convertButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                onConvertClicked(tsxFileTextField.getText(), imageFileTextField.getText(), outputFolderTextField.getText(), outputTsxFileTextField.getText(), outputImageFileTextField.getText(), Integer.parseInt(borderTextField.getText()));
+                onConvertClicked(tsxFileTextField.getText(), imageFileTextField.getText(), outputFolderTextField.getText(), outputTsxFileTextField.getText(), outputImageFileTextField.getText(), Integer.parseInt(borderTextField.getText()), overrideExistingFiles.isChecked());
             }
         });
 
@@ -103,12 +128,32 @@ public class InteractiveDesktopMode extends ScreenAdapter {
         table.add(buttonTable).colspan(2).growX();
 
         buttonTable.add(validationLabel).right().expandX().padRight(12);
+        buttonTable.add(overrideExistingFiles).padRight(12);
         buttonTable.add(convertButton).right();
+
+        dialog.show(stage);
     }
 
-    private void onConvertClicked(String tsxPath, String imagePath, String outputFolderPath, String relativeOutputTsxPath, String relativeOutputImagePath, int border) {
+    private void onConvertClicked(String tsxPath, String imagePath, String outputFolderPath, String relativeOutputTsxPath, String relativeOutputImagePath, int border, boolean overrideExistingFiles) {
+        var outputFolder = Gdx.files.absolute(outputFolderPath);
+
+        if (!overrideExistingFiles) {
+            var outputTsxFile = outputFolder.child(relativeOutputTsxPath);
+            var outputImageFile = outputFolder.child(relativeOutputImagePath);
+
+            if (outputTsxFile.exists()) {
+                Dialogs.showErrorDialog(stage, "Output .tsx file already exists");
+                return;
+            }
+
+            if (outputImageFile.exists()) {
+                Dialogs.showErrorDialog(stage, "Output .png file already exists");
+                return;
+            }
+        }
+
         var borderCreator = new TiledTsxBorderCreator(Gdx.files.absolute(tsxPath), Gdx.files.absolute(imagePath));
-        var result = borderCreator.convert(Gdx.files.absolute(outputFolderPath), relativeOutputTsxPath, relativeOutputImagePath, border);
+        var result = borderCreator.convert(outputFolder, relativeOutputTsxPath, relativeOutputImagePath, border);
 
         var resultDialog = new ResultDialog(result);
         resultDialog.show(stage);
@@ -126,6 +171,11 @@ public class InteractiveDesktopMode extends ScreenAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE))
             Gdx.app.exit();
+
+        batch.setProjectionMatrix(stage.getCamera().combined);
+        batch.begin();
+        batch.draw(background, 0, 0, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
 
         stage.act(delta);
         stage.draw();

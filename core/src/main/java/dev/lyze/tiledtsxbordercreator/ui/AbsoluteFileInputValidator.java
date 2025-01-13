@@ -4,12 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.kotcrab.vis.ui.util.form.FormInputValidator;
 
 public class AbsoluteFileInputValidator extends FormInputValidator {
-    public AbsoluteFileInputValidator(String message) {
+    private final String fileEnding;
+
+    public AbsoluteFileInputValidator(String fileEnding, String message) {
         super(message);
+
+        this.fileEnding = fileEnding;
+    }
+
+    public AbsoluteFileInputValidator(String message) {
+        this(null, message);
     }
 
     @Override
     protected boolean validate(String input) {
-        return Gdx.files.absolute(input).exists();
+        return (fileEnding == null || input.endsWith(fileEnding)) && Gdx.files.absolute(input).exists();
     }
 }
