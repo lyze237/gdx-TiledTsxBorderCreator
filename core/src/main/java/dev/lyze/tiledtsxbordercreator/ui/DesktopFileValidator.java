@@ -3,16 +3,16 @@ package dev.lyze.tiledtsxbordercreator.ui;
 import com.badlogic.gdx.Gdx;
 import com.kotcrab.vis.ui.util.form.FormInputValidator;
 
-public class AbsoluteFileInputValidator extends FormInputValidator {
+public class DesktopFileValidator extends FormInputValidator {
     private final String fileEnding;
 
-    public AbsoluteFileInputValidator(String fileEnding, String message) {
+    public DesktopFileValidator(String fileEnding, String message) {
         super(message);
 
         this.fileEnding = fileEnding;
     }
 
-    public AbsoluteFileInputValidator(String message) {
+    public DesktopFileValidator(String message) {
         this(null, message);
     }
 

@@ -10,7 +10,7 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
 import dev.lyze.tiledtsxbordercreator.utils.StringUtils;
 
-public class FileTextField extends VisTable {
+public class DesktopFileTextField extends VisTable {
     private final IDesktopNatives natives;
     private final VisValidatableTextField textField = new VisValidatableTextField();
 
@@ -18,7 +18,7 @@ public class FileTextField extends VisTable {
 
     private StringChangeListener changeListener;
 
-    public FileTextField(IDesktopNatives natives) {
+    public DesktopFileTextField(IDesktopNatives natives) {
         this.natives = natives;
 
         textField.setReadOnly(true);

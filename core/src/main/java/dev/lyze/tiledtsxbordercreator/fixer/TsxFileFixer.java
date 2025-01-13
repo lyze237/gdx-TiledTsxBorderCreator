@@ -20,7 +20,7 @@ public class TsxFileFixer {
         metadata = new TsxFileMetadata(tsx);
     }
 
-    public TsxFileFixerResult convert(String relativeImageOutputPath, int border) {
+    public TsxFileFixerResult convert(String relativeTsxOutputPath, String relativeImageOutputPath, int border) {
         var tiles = unpackImage(metadata, imageFile);
         var newTiles = addBorderToTiles(tiles, border);
         disposeTiles(tiles);
@@ -29,7 +29,7 @@ public class TsxFileFixer {
         disposeTiles(newTiles);
 
         var newTsxFile = metadata.generateNewTsxFile(relativeImageOutputPath, newImage, border);
-        return new TsxFileFixerResult(newTsxFile, newImage);
+        return new TsxFileFixerResult(relativeTsxOutputPath, newTsxFile, relativeImageOutputPath, newImage);
     }
 
     public Pixmap repackImage(Array<Pixmap> tiles) {

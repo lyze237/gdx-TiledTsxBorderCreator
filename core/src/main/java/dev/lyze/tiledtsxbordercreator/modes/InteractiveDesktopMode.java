@@ -3,7 +3,6 @@ package dev.lyze.tiledtsxbordercreator.modes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,27 +11,27 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.util.form.FormValidator;
+import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.*;
 import dev.lyze.tiledtsxbordercreator.TiledTsxBorderCreator;
+import dev.lyze.tiledtsxbordercreator.natives.ICommandLineNatives;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
 import dev.lyze.tiledtsxbordercreator.ui.*;
 
-import java.lang.invoke.VarHandle;
-
 public class InteractiveDesktopMode extends ScreenAdapter {
     private final IDesktopNatives desktopNatives;
+    private final ICommandLineNatives commandLineNatives;
 
     private final Stage stage = new Stage(new ScreenViewport());
 
     private final SpriteBatch batch = new SpriteBatch();
     private final Texture background = new Texture("background.png");
 
-    public InteractiveDesktopMode(IDesktopNatives desktopNatives) {
+    public InteractiveDesktopMode(IDesktopNatives desktopNatives, ICommandLineNatives commandLineNatives) {
         this.desktopNatives = desktopNatives;
+        this.commandLineNatives = commandLineNatives;
 
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
@@ -52,12 +51,12 @@ public class InteractiveDesktopMode extends ScreenAdapter {
         root.add(table).expand();
 
         var convertButton = new VisTextButton("Convert");
-        var validator = new FormValidator(convertButton);
+        var validator = new SimpleFormValidator(convertButton);
 
         var validationLabel = new VisLabel();
 
-        var tsxFileTextField = new FileTextField(desktopNatives);
-        var imageFileTextField = new FileTextField(desktopNatives);
+        var tsxFileTextField = new DesktopFileTextField(desktopNatives);
+        var imageFileTextField = new DesktopFileTextField(desktopNatives);
 
         var outputFolderTextField = new FolderTextField(desktopNatives);
         var outputTsxFileTextField = new VisValidatableTextField();
@@ -67,9 +66,9 @@ public class InteractiveDesktopMode extends ScreenAdapter {
 
         var overrideExistingFiles = new VisCheckBox("Override existing files");
 
-        validator.custom(tsxFileTextField.getTextField(), new AbsoluteFileInputValidator(".tsx", "Tsx file not set or not a .tsx file"));
-        validator.custom(imageFileTextField.getTextField(), new AbsoluteFileInputValidator(".png", "Image file not set or not a .png file"));
-        validator.custom(outputFolderTextField.getTextField(), new AbsoluteFileInputValidator("Output folder not set"));
+        validator.custom(tsxFileTextField.getTextField(), new DesktopFileValidator(".tsx", "Tsx file not set or not a .tsx file"));
+        validator.custom(imageFileTextField.getTextField(), new DesktopFileValidator(".png", "Image file not set or not a .png file"));
+        validator.custom(outputFolderTextField.getTextField(), new DesktopFileValidator("Output folder not set"));
         validator.custom(outputTsxFileTextField, new FileEndsInValidator(".tsx", "Output .tsx file does not end in .tsx"));
         validator.custom(outputImageFileTextField, new FileEndsInValidator(".png", "Output .png file file does not end in .png"));
         validator.integerNumber(borderTextField, "Border must be an number");
@@ -153,7 +152,8 @@ public class InteractiveDesktopMode extends ScreenAdapter {
         }
 
         var borderCreator = new TiledTsxBorderCreator(Gdx.files.absolute(tsxPath), Gdx.files.absolute(imagePath));
-        var result = borderCreator.convert(outputFolder, relativeOutputTsxPath, relativeOutputImagePath, border);
+        var result = borderCreator.convert(relativeOutputTsxPath, relativeOutputImagePath, border);
+        borderCreator.writeResult(result, outputFolder, relativeOutputTsxPath, relativeOutputImagePath, commandLineNatives);
 
         var resultDialog = new ResultDialog(result);
         resultDialog.show(stage);
