@@ -15,20 +15,11 @@ public class Lwjgl3Launcher {
 
     private static Lwjgl3Application createApplication(String[] args) {
         var configuration = getDefaultConfiguration();
-        var dragAndDropListener = new DragAndDropListener();
-        configuration.setWindowListener(new Lwjgl3WindowAdapter() {
-            @Override
-            public void filesDropped(String[] files) {
-                for (var file : files) {
-                    dragAndDropListener.invokeListener(file);
-                }
-            }
-        });
         var main = new Main();
         main.setArgs(args);
         main.setDesktopNatives(new DesktopNatives());
         main.setCommandLineNatives(new CommandLineNatives());
-        main.setDragAndDropListener(dragAndDropListener);
+        main.setDragAndDropListener(new DesktopDragAndDropListener());
         return new Lwjgl3Application(main, configuration);
     }
 

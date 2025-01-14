@@ -1,28 +1,34 @@
 package dev.lyze.tiledtsxbordercreator.gwt;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.badlogic.gdx.backends.gwt.GwtGraphics;
 import dev.lyze.tiledtsxbordercreator.Main;
 
-/** Launches the GWT application. */
+/**
+ * Launches the GWT application.
+ */
 public class GwtLauncher extends GwtApplication {
-        @Override
-        public GwtApplicationConfiguration getConfig () {
-            // Resizable application, uses available space in browser with no padding:
-            GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(true);
-            cfg.padVertical = 0;
-            cfg.padHorizontal = 0;
-            return cfg;
-            // If you want a fixed size application, comment out the above resizable section,
-            // and uncomment below:
-            //return new GwtApplicationConfiguration(640, 480);
-        }
+    @Override
+    public GwtApplicationConfiguration getConfig() {
+        // Resizable application, uses available space in browser with no padding:
+        GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(true);
+        cfg.padVertical = 0;
+        cfg.padHorizontal = 0;
+        return cfg;
+        // If you want a fixed size application, comment out the above resizable section,
+        // and uncomment below:
+        //return new GwtApplicationConfiguration(640, 480);
+    }
 
-        @Override
-        public ApplicationListener createApplicationListener () {
-            var main = new Main();
-            main.setGwtNatives(new GwtNatives());
-            return main;
-        }
+    @Override
+    public ApplicationListener createApplicationListener() {
+        var main = new Main();
+        main.setGwtNatives(new GwtNatives());
+        main.setDragAndDropListener(new GwtDragAndDropListener());
+        return main;
+    }
 }

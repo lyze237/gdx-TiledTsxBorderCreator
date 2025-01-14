@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,6 +20,9 @@ import dev.lyze.tiledtsxbordercreator.TiledTsxBorderCreator;
 import dev.lyze.tiledtsxbordercreator.natives.DragAndDropListener;
 import dev.lyze.tiledtsxbordercreator.natives.ICommandLineNatives;
 import dev.lyze.tiledtsxbordercreator.natives.IDesktopNatives;
+import dev.lyze.tiledtsxbordercreator.natives.dragAndDrop.FolderTarget;
+import dev.lyze.tiledtsxbordercreator.natives.dragAndDrop.ImageTarget;
+import dev.lyze.tiledtsxbordercreator.natives.dragAndDrop.TsxTarget;
 import dev.lyze.tiledtsxbordercreator.ui.*;
 
 public class InteractiveDesktopMode extends ScreenAdapter {
@@ -68,15 +72,27 @@ public class InteractiveDesktopMode extends ScreenAdapter {
         var borderTextField = new VisValidatableTextField("4");
         var overrideExistingFiles = new VisCheckBox("Override existing files");
 
-        dragAndDropListener.setListener(new StringChangeListener() {
+        dragAndDropListener.setFolderTarget(new FolderTarget() {
             @Override
-            public void changed(String path) {
+            public void onDropped(String path) {
+                outputFolderTextField.setPath(path);
+            }
+        });
+
+        dragAndDropListener.setImageTarget(new ImageTarget() {
+            @Override
+            public void onDropped(String path, Pixmap image) {
+                if (path.endsWith(".png")) {
+                    imageFileTextField.setPath(path);
+                }
+            }
+        });
+
+        dragAndDropListener.setTsxTarget(new TsxTarget() {
+            @Override
+            public void onDropped(String path, String content) {
                 if (path.endsWith(".tsx")) {
                     tsxFileTextField.setPath(path);
-                } else if (path.endsWith(".png")) {
-                    imageFileTextField.setPath(path);
-                } else if (Gdx.files.absolute(path).isDirectory()) {
-                    outputFolderTextField.setPath(path);
                 }
             }
         });

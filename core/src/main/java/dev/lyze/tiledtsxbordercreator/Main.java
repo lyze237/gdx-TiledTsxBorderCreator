@@ -20,9 +20,12 @@ public class Main extends Game {
 
     @Override
     public void create() {
+        if (dragAndDropListener != null)
+            dragAndDropListener.setupDragAndDrop();
+
         switch (Gdx.app.getType()) {
             case WebGL:
-                setScreen(new InteractiveGwtMode(gwtNatives));
+                setScreen(new InteractiveGwtMode(gwtNatives, dragAndDropListener));
                 break;
             case Desktop:
                 if (args.length > 0) {

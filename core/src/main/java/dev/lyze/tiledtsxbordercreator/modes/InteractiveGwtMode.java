@@ -16,19 +16,24 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.*;
 import dev.lyze.tiledtsxbordercreator.fixer.TsxFileFixer;
+import dev.lyze.tiledtsxbordercreator.natives.DragAndDropListener;
 import dev.lyze.tiledtsxbordercreator.natives.IGwtNatives;
+import dev.lyze.tiledtsxbordercreator.natives.dragAndDrop.ImageTarget;
+import dev.lyze.tiledtsxbordercreator.natives.dragAndDrop.TsxTarget;
 import dev.lyze.tiledtsxbordercreator.ui.*;
 
 public class InteractiveGwtMode extends ScreenAdapter {
     private final IGwtNatives gwtNatives;
+    private final DragAndDropListener dragAndDropListener;
 
     private final Stage stage = new Stage(new ScreenViewport());
 
     private final SpriteBatch batch = new SpriteBatch();
     private final Texture background = new Texture("background.png");
 
-    public InteractiveGwtMode(IGwtNatives gwtNatives) {
+    public InteractiveGwtMode(IGwtNatives gwtNatives, DragAndDropListener dragAndDropListener) {
         this.gwtNatives = gwtNatives;
+        this.dragAndDropListener = dragAndDropListener;
 
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
@@ -54,6 +59,19 @@ public class InteractiveGwtMode extends ScreenAdapter {
 
         var tsxFileTextField = new GwtTsxFileTextField(gwtNatives);
         var imageFileTextField = new GwtImageFileTextField(gwtNatives);
+
+        dragAndDropListener.setTsxTarget(new TsxTarget() {
+            @Override
+            public void onDropped(String path, String content) {
+                tsxFileTextField.pickedTsxFile(path, content);
+            }
+        });
+        dragAndDropListener.setImageTarget(new ImageTarget() {
+            @Override
+            public void onDropped(String path, Pixmap image) {
+                imageFileTextField.pickedImageFile(path, image);
+            }
+        });
 
         var outputTsxFileTextField = new VisValidatableTextField();
         var outputImageFileTextField = new VisValidatableTextField();
