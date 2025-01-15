@@ -16,7 +16,7 @@ This prevents opengl "artifacts" like those ugly "lines" when zooming in or out.
 
 Alternatively, you can [download](https://github.com/lyze237/gdx-TiledTsxBorderCreator/releases) windows or linux zip files which include jres
 
-#### There are four ways to run the app
+#### There are five ways to run the app:
 
 1. Interactive desktop mode:
     1. Download the desktop jar from the [releases](https://github.com/lyze237/gdx-TiledTsxBorderCreator/releases) page
@@ -35,15 +35,46 @@ Alternatively, you can [download](https://github.com/lyze237/gdx-TiledTsxBorderC
        1. Inside `buildscript { repositories { } }` add `maven { url 'https://jitpack.io' }`
        2. Inside `buildscript { dependencies { } }` add `classpath "com.github.lyze237.gdx-TiledTsxBorderCreator:headless:VERSION"` and replace VERSION with the version from jitpack
     4. Add a new gradle task: 
-        ```gradle
+        ```groovy
         import dev.lyze.tiledtsxbordercreator.headless.HeadlessLauncher
         task addBorderToTiles{
             doLast {
-                HeadlessLauncher.main(new String[] {"--help"});
+                HeadlessLauncher.main(new String[] {"--help"})
             }
         }
         ```
     5. See "Commandline mode" for what arguments you need to pass.
+    
+        Full example: 
+        ```groovy
+        buildscript {
+          repositories {
+            // ...
+            maven { url 'https://jitpack.io' }
+          }
+          dependencies {
+            // ...
+            classpath "com.github.lyze237.gdx-TiledTsxBorderCreator-Test:headless:v1.0.3" // remember to update the version to the latest version
+          }
+        }
+
+        import dev.lyze.tiledtsxbordercreator.headless.HeadlessLauncher
+        task padTiles {
+          doLast {
+            HeadlessLauncher.main(new String[] {"--help"})
+          }
+        }
+        ```
+5. As a library:
+    1. Check [jitpack.io](https://jitpack.io/#lyze237/gdx-TiledTsxBorderCreator) for the latest version
+    2. Open the `build.gradle` file of your module
+    3. Inside `dependencies {  }` add `implementation "com.github.lyze237.gdx-TiledTsxBorderCreator:headless:VERSION"`
+    4. Then use it like this:
+        ```java
+        var borderCreator = new TiledTsxBorderCreator(Gdx.files.local("input.tsx"), Gdx.files.local("input.png"));
+        var result = borderCreator.convert("output.tsx", "output.png", 4);
+        borderCreator.writeResult(result, Gdx.files.local("out"), "output.tsx", "output.png", new CommandLineNatives());
+        ```
 
 ### Run from source:
 
